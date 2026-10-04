@@ -1,129 +1,115 @@
-Orbital: autenticación segura con cookies httpOnly
+markdown
+# 🚀 Orbital - Centro de Control
 
-Aplicación web con un sistema de autenticación construido con Next.js (App Router) y Supabase. La sesión vive en cookies httpOnly, toda la autenticación pasa por Server Actions, y las rutas privadas están protegidas por el proxy de Next.js. La interfaz tiene el aspecto de un centro de control espacial.
+Sistema de autenticación seguro con **cookies httpOnly**, **Supabase** y **Next.js 16**, aplicando las mejores prácticas de seguridad web: protección contra XSS y CSRF, Server Actions, middleware de protección de rutas y gestión segura de sesiones.
 
-Repositorio: https://github.com/TU_USUARIO/TU_REPOSITORIO
-Aplicación en producción: https://TU-APP.vercel.app
-Capturas
-Login	Dashboard	Cookies httpOnly
-Mostrar imagen	Mostrar imagen	Mostrar imagen
-Stack
-Next.js 16 (App Router) y React 19
-TypeScript
-Supabase (Auth + Database) con @supabase/ssr
-Zod para validación
-Tailwind CSS
-Funcionalidades
-Registro con validación en cliente y servidor
-Verificación de correo electrónico
-Inicio y cierre de sesión
-Recuperación y cambio de contraseña
-Dashboard privado con los datos del usuario autenticado
-Navegación condicional según el estado de la sesión
-Redirecciones automáticas: usuarios sin sesión van a /login, y usuarios con sesión que visitan /login o /register van a /dashboard
-Refresco automático de la sesión en cada petición
-Estructura
-src/
-├── proxy.ts                       # Entrada del proxy (antes "middleware")
-├── app/
-│   ├── page.tsx                   # Portada
-│   ├── (auth)/
-│   │   ├── login/page.tsx
-│   │   ├── register/page.tsx
-│   │   └── forgot-password/page.tsx
-│   ├── auth/
-│   │   ├── callback/route.ts      # Confirmación de correo y recuperación
-│   │   └── reset-password/page.tsx
-│   └── dashboard/page.tsx         # Ruta privada
-├── components/                    # Navbar, formularios, cuenta regresiva
-└── lib/
-    ├── supabase/
-    │   ├── server.ts              # Cliente para Server Components, Actions y Route Handlers
-    │   ├── client.ts              # Cliente para Client Components (datos no sensibles)
-    │   └── proxy.ts               # Cliente y lógica de sesión del proxy
-    ├── actions/auth.ts            # Server Actions: registro, login, logout, recuperación
-    └── validations/auth.ts        # Esquemas de Zod compartidos
-Instalación
+## 🌐 Demo en Producción
 
-Requisitos: Node.js 20.9 o superior y una cuenta en Supabase.
+👉 **[Ver aplicación en vivo](https://TU-LINK-DE-VERCEL.vercel.app)** _(actualizar después del deploy)_
+
+## 🛠️ Stack Tecnológico
+
+- **Next.js 16+** (App Router)
+- **TypeScript** (tipado completo)
+- **Supabase** (Authentication + Database)
+- **@supabase/ssr** (Gestión de cookies httpOnly)
+- **Tailwind CSS** (Estilos)
+- **Vercel** (Deploy en producción)
+
+## 🔐 Características de Seguridad Implementadas
+
+| Medida | Descripción |
+|---|---|
+| **Cookies httpOnly** | Los tokens JWT nunca son accesibles por JavaScript del cliente |
+| **Flag `secure`** | Activado automáticamente en producción (HTTPS) |
+| **Flag `sameSite: lax`** | Protección contra ataques CSRF |
+| **Sin localStorage** | Ningún token se guarda en almacenamiento accesible |
+| **Server Actions** | Toda la lógica de auth corre en el servidor |
+| **Middleware** | Protección y refresco automático de sesiones |
+| **Validación doble** | Cliente (HTML5) + Servidor (Zod) |
+| **Variables de entorno** | Secretos separados en `.env.local` (nunca en Git) |
+
+## ✨ Funcionalidades
+
+- ✅ Registro con validación de email y confirmación de contraseña
+- ✅ Inicio de sesión con Server Actions
+- ✅ Cierre de sesión seguro
+- ✅ Recuperación de contraseña por email
+- ✅ Verificación de email (callback)
+- ✅ Reset de contraseña con token
+- ✅ Dashboard privado con información del usuario
+- ✅ Middleware protegiendo rutas y redirigiendo según estado de auth
+
+## 🎨 Diseño UX/UI
+
+- 🎬 Pantalla de bienvenida tipo "Centro de Control Espacial"
+- 🎥 Videos de fondo con sonido activado por interacción del usuario (SpaceX-style)
+- 🌌 Efectos de vidrio esmerilado (backdrop-blur)
+- ✨ Animaciones suaves (fadeInUp)
+
+## 📦 Instalación Local
+
+### Prerrequisitos
+- Node.js 18+ 
+- Cuenta en [Supabase](https://supabase.com)
+
+### Pasos
+
+1. **Clona el repositorio:**
+   ```bash
+   git clone https://github.com/juanwright101084-svg/orbital-centro-de-control.git
+   cd orbital-centro-de-control
+Instala dependencias:
 
 bash
-git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
-cd TU_REPOSITORIO
 npm install
-cp .env.example .env.local   # en Windows PowerShell: Copy-Item .env.example .env.local
-Variables de entorno
+Configura las variables de entorno:
 
-Completa .env.local con los datos de tu proyecto (Supabase → Project Settings → API Keys):
+Crea un archivo .env.local en la raíz con:
 
 env
-NEXT_PUBLIC_SUPABASE_URL=https://TU-PROYECTO.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_publica
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
+(Puedes guiarte por .env.example)
 
-Usa solo la clave pública (publishable o anon). Nunca pongas la service_role ni la secret key en estas variables.
+Corre el servidor de desarrollo:
 
-Configuración de Supabase
-
-En Authentication → URL Configuration:
-
-Site URL: http://localhost:3000
-Redirect URLs: http://localhost:3000/auth/callback y http://localhost:3000/**
-
-En Authentication → Sign In / Providers, deja habilitado Email con Confirm email activado.
-
-Ejecución
 bash
 npm run dev
+Abre en el navegador:
 
-Abre http://localhost:3000.
-
-Cómo probarlo
-Entra a /dashboard sin sesión: te redirige a /login.
-Regístrate en /register y confirma el enlace que llega al correo.
-Inicia sesión: llegas al dashboard.
-Visita /login con la sesión abierta: te redirige al dashboard.
-Cierra sesión desde la barra superior.
-Prueba "Recuperar contraseña" desde /login.
-Seguridad
-
-Cookies. Las cookies de sesión se escriben con httpOnly: true, secure (en producción), sameSite: "lax" y path: "/". Se fuerzan tanto en lib/supabase/server.ts como en lib/supabase/proxy.ts.
-
-Por qué toda la autenticación va por el servidor. Por defecto, las cookies de @supabase/ssr no son httpOnly, porque el cliente de navegador necesita leerlas. Aquí se fuerza httpOnly y el login, el registro y el logout se hacen únicamente con Server Actions. Por eso el cliente de navegador (client.ts) no ve la sesión: es intencional, y se reserva para datos no sensibles.
-
-XSS. El token de sesión no es accesible desde JavaScript, así que un script inyectado no puede robarlo. React escapa el contenido por defecto y no se usa dangerouslySetInnerHTML. Se añaden cabeceras de seguridad en next.config.ts.
-
-CSRF. Las Server Actions de Next.js solo aceptan peticiones POST y comparan las cabeceras Origin y Host. Además, las cookies usan sameSite: "lax".
-
-Sin almacenamiento en el navegador. Ningún token se guarda en localStorage ni sessionStorage.
-
-Validación. Los datos se validan con Zod en el servidor (la validación que realmente cuenta) y con atributos HTML en el cliente.
-
-Verificación de sesión. El proxy y las páginas usan supabase.auth.getUser(), que valida el token contra Supabase, en lugar de getSession(), que solo lee la cookie.
-
-Mensajes de error. Son informativos pero genéricos ("Correo o contraseña incorrectos"), y la recuperación de contraseña responde igual exista o no el correo, para evitar la enumeración de usuarios.
-
-Redirecciones. El parámetro next del callback solo acepta rutas internas, para evitar redirecciones abiertas.
-
-Variables de entorno. Los secretos no se suben al repositorio (.env.local está en .gitignore); .env.example documenta las variables necesarias.
-
-Nota sobre el proxy
-
-Next.js 16 renombró middleware.ts a proxy.ts. Este proyecto usa src/proxy.ts, que cumple la misma función.
-
-Despliegue en Vercel
-Sube el repositorio a GitHub e impórtalo en Vercel.
-En Settings → Environment Variables, agrega las tres variables. En producción, NEXT_PUBLIC_SITE_URL debe ser la URL de la app, por ejemplo https://tu-app.vercel.app.
-En Supabase (Authentication → URL Configuration), agrega la URL de producción:
-Redirect URLs: https://tu-app.vercel.app/auth/callback y https://tu-app.vercel.app/**
-Si quieres, cambia la Site URL a la de producción.
-Vuelve a desplegar y prueba el flujo completo.
-Limitaciones conocidas
-El proyecto usa el servicio de correo integrado de Supabase, que solo envía a miembros de la organización y tiene un límite bajo de envíos por hora. Para enviar a cualquier usuario hay que configurar un SMTP propio (por ejemplo, Resend o Brevo).
-Las misiones y la telemetría del dashboard son datos de demostración.
-Scripts
-Comando	Descripción
-npm run dev	Servidor de desarrollo
-npm run build	Compilación de producción
-npm run start	Servidor de producción
-npm run lint	Revisión con ESLint
+text
+http://localhost:3000
+📁 Estructura del Proyecto
+text
+src/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/page.tsx              # Iniciar sesión
+│   │   ├── register/page.tsx           # Crear cuenta
+│   │   └── forgot-password/page.tsx    # Recuperar contraseña
+│   ├── auth/
+│   │   ├── callback/route.ts           # Callback de Supabase
+│   │   └── reset-password/page.tsx     # Reset con token
+│   ├── dashboard/page.tsx              # Ruta protegida
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+├── components/
+│   ├── SubmitButton.tsx
+│   ├── Navbar.tsx
+│   └── ...
+├── lib/
+│   ├── actions/auth.ts                 # Server Actions
+│   ├── supabase/
+│   │   ├── client.ts
+│   │   ├── server.ts
+│   │   └── proxy.ts
+│   └── validations/auth.ts             # Schemas Zod
+├── proxy.ts
+└── middleware.ts                       # Protección de rutas
+🔑 Variables de Entorno Requeridas
+Variable	Descripción	Dónde obtenerla
+NEXT_PUBLIC_SUPABASE_URL	URL del proyecto Supabase	Supabase → Settings → API
+NEXT_PUBLIC_SUPABASE_ANON_KEY	Clave pública (anon)	Supabase → Settings → API
+⚠️ NUNCA subas tu .env.local a Git. El archivo .gitignore ya lo excluye.

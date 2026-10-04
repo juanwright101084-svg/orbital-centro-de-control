@@ -26,7 +26,8 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative flex min-h-screen items-start justify-center overflow-hidden bg-black pt-12 md:pt-16">
+    // ⬇️ CAMBIO APLICADO: pt-4 md:pt-6 (antes era pt-12 md:pt-16)
+    <main className="relative flex min-h-screen items-start justify-center overflow-hidden bg-black pt-4 md:pt-6">
       
       {/* Video de Fondo */}
       <video
