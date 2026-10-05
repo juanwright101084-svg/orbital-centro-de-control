@@ -104,7 +104,9 @@ export async function resetPassword(
     password: parsed.data.password,
   });
 
-  if (error) return { error: "No se pudo actualizar la contraseña." };
+  // ✅ CAMBIO 1: Mostrar el error real de Supabase (antes era mensaje genérico)
+  if (error) return { error: error.message };
 
-  redirect("/dashboard");
+  // ✅ CAMBIO 2: Devolver mensaje de éxito en lugar de redirigir
+  return { success: "Contraseña actualizada correctamente." };
 }

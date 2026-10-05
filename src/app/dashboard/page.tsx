@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Countdown } from "@/components/Countdown";
@@ -167,6 +168,18 @@ export default async function DashboardPage() {
               <dd className="mt-1">Cookie httpOnly</dd>
             </div>
           </dl>
+
+          {/* ⬇️ ENLACE A CONFIGURACIÓN DE CUENTA ⬇️ */}
+          <div className="mt-6 flex justify-end">
+            <Link
+              href="/dashboard/settings"
+              className="inline-flex items-center gap-2 rounded border border-white/20 bg-white/5 px-5 py-2.5 text-sm text-white/80 transition hover:border-blue-500 hover:bg-blue-500/10 hover:text-white"
+            >
+              <span>⚙️</span>
+              <span>Cambiar contraseña</span>
+              <span>→</span>
+            </Link>
+          </div>
         </section>
 
         <p className="text-sm text-white/40">
