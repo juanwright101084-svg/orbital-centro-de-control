@@ -35,8 +35,8 @@ export async function register(
   });
 
   if (error) {
-    // Mensaje genérico: no revela si el correo ya existe
-    return { error: "No se pudo completar el registro. Intenta de nuevo." };
+    // 🔧 TEMPORAL: mostrar error real de Supabase para debug
+    return { error: `Error: ${error.message}` };
   }
 
   return { success: "Revisa tu correo para confirmar tu cuenta." };
@@ -51,8 +51,23 @@ export async function login(
     return { fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
+  // 🔧 DEBUG TEMPORAL
+  console.log("🔍 LOGIN ACTION DEBUG:");
+  console.log("  Email:", parsed.data.email);
+  console.log("  Password length:", parsed.data.password.length);
+
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
+
+  // 🔧 DEBUG TEMPORAL
+  console.log("  Supabase error message:", error?.message);
+  console.log("  Supabase error status:", error?.status);
+  console.log("  Supabase error code:", error?.code);
+  console.log("  User ID (si funciona):", data?.user?.id);
+  console.log(
+    "  Session (si funciona):",
+    data?.session ? "✅ Creada" : "❌ Nula"
+  );
 
   if (error) {
     return { error: "Correo o contraseña incorrectos." };
@@ -104,9 +119,9 @@ export async function resetPassword(
     password: parsed.data.password,
   });
 
-  // ✅ CAMBIO 1: Mostrar el error real de Supabase (antes era mensaje genérico)
+  // ✅ Mostrar el error real de Supabase
   if (error) return { error: error.message };
 
-  // ✅ CAMBIO 2: Devolver mensaje de éxito en lugar de redirigir
+  // ✅ Devolver mensaje de éxito
   return { success: "Contraseña actualizada correctamente." };
 }
