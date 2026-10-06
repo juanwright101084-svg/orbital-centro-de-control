@@ -23,11 +23,13 @@ export async function register(
   formData: FormData
 ): Promise<ActionState> {
   const parsed = registerSchema.safeParse(Object.fromEntries(formData));
+
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
   const supabase = await createClient();
+
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
@@ -35,8 +37,30 @@ export async function register(
   });
 
   if (error) {
-    // 🔧 TEMPORAL: mostrar error real de Supabase para debug
-    return { error: `Error: ${error.message}` };
+    console.error("signUp error:", {
+      status: error.status,
+      code: error.code,
+      message: error.message,
+    });
+
+    if (error.code === "over_email_send_rate_limit") {
+      return {
+        error: "Se enviaron demasiados correos. Espera unos minutos.",
+      };
+    }
+
+    if (error.code === "weak_password") {
+      return { error: "La contraseña es demasiado débil." };
+    }
+
+    if (error.message.toLowerCase().includes("sending confirmation email")) {
+      return {
+        error:
+          "No pudimos enviar el correo de confirmación. Intenta más tarde.",
+      };
+    }
+
+    return { error: "No se pudo completar el registro. Intenta de nuevo." };
   }
 
   return { success: "Revisa tu correo para confirmar tu cuenta." };
@@ -47,27 +71,14 @@ export async function login(
   formData: FormData
 ): Promise<ActionState> {
   const parsed = loginSchema.safeParse(Object.fromEntries(formData));
+
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
-  // 🔧 DEBUG TEMPORAL
-  console.log("🔍 LOGIN ACTION DEBUG:");
-  console.log("  Email:", parsed.data.email);
-  console.log("  Password length:", parsed.data.password.length);
-
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
 
-  // 🔧 DEBUG TEMPORAL
-  console.log("  Supabase error message:", error?.message);
-  console.log("  Supabase error status:", error?.status);
-  console.log("  Supabase error code:", error?.code);
-  console.log("  User ID (si funciona):", data?.user?.id);
-  console.log(
-    "  Session (si funciona):",
-    data?.session ? "✅ Creada" : "❌ Nula"
-  );
+  const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
     return { error: "Correo o contraseña incorrectos." };
@@ -79,9 +90,12 @@ export async function login(
 
 export async function logout() {
   const supabase = await createClient();
+
   await supabase.auth.signOut();
+
   revalidatePath("/", "layout");
-  redirect("/login");
+
+  redirect("/");
 }
 
 export async function forgotPassword(
@@ -89,16 +103,17 @@ export async function forgotPassword(
   formData: FormData
 ): Promise<ActionState> {
   const parsed = forgotSchema.safeParse(Object.fromEntries(formData));
+
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
   const supabase = await createClient();
+
   await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${SITE_URL}/auth/callback?next=/auth/reset-password`,
   });
 
-  // Siempre la misma respuesta, exista o no el correo
   return {
     success:
       "Si el correo existe, recibirás un enlace para restablecer tu contraseña.",
@@ -110,18 +125,38 @@ export async function resetPassword(
   formData: FormData
 ): Promise<ActionState> {
   const parsed = resetSchema.safeParse(Object.fromEntries(formData));
+
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
   const supabase = await createClient();
+
   const { error } = await supabase.auth.updateUser({
     password: parsed.data.password,
   });
 
-  // ✅ Mostrar el error real de Supabase
-  if (error) return { error: error.message };
+  if (error) {
+    console.error("updateUser error:", {
+      status: error.status,
+      code: error.code,
+      message: error.message,
+    });
 
-  // ✅ Devolver mensaje de éxito
+    if (error.code === "same_password") {
+      return {
+        error: "La nueva contraseña debe ser distinta de la anterior.",
+      };
+    }
+
+    if (error.code === "weak_password") {
+      return { error: "La contraseña es demasiado débil." };
+    }
+
+    return {
+      error: "No se pudo actualizar la contraseña. Intenta de nuevo.",
+    };
+  }
+
   return { success: "Contraseña actualizada correctamente." };
 }

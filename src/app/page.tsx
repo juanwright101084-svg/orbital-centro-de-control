@@ -24,6 +24,7 @@ export default async function Home() {
           <br />
           de control
         </h1>
+
         <p className="mt-6 max-w-md text-lg text-white/70">
           Inicia sesión para ver el estado de las misiones y la telemetría en
           tiempo real.
@@ -41,10 +42,11 @@ export default async function Home() {
             <>
               <Link
                 href="/login"
-                className="bg-white px-7 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black hover:bg-white/85"
+                className="border border-white/60 bg-black px-7 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white hover:bg-white hover:text-black"
               >
                 Iniciar sesión
               </Link>
+
               <Link
                 href="/register"
                 className="border border-white/60 px-7 py-3 text-xs uppercase tracking-[0.3em] hover:bg-white hover:text-black"

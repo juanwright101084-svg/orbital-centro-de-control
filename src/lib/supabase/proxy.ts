@@ -3,6 +3,20 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
 
+// Redirige conservando las cookies de sesión refrescadas en la respuesta
+function redirectTo(
+  request: NextRequest,
+  pathname: string,
+  session: NextResponse
+) {
+  const url = request.nextUrl.clone();
+  url.pathname = pathname;
+
+  const redirect = NextResponse.redirect(url);
+  session.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+  return redirect;
+}
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -44,15 +58,11 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = PUBLIC_AUTH_ROUTES.includes(pathname);
 
   if (!user && isProtected) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    return redirectTo(request, "/login", response);
   }
 
   if (user && isAuthRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
+    return redirectTo(request, "/dashboard", response);
   }
 
   return response;

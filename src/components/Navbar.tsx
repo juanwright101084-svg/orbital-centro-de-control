@@ -25,6 +25,7 @@ export async function Navbar() {
           <Link href="/dashboard" className={linkClass}>
             Dashboard
           </Link>
+
           <form action={logout}>
             <button
               type="submit"
@@ -34,19 +35,7 @@ export async function Navbar() {
             </button>
           </form>
         </div>
-      ) : (
-        <div className="flex items-center gap-4 sm:gap-6">
-          <Link href="/login" className={linkClass}>
-            Entrar
-          </Link>
-          <Link
-            href="/register"
-            className="border border-white/60 px-4 py-2 text-xs uppercase tracking-[0.25em] hover:bg-white hover:text-black"
-          >
-            Registrarse
-          </Link>
-        </div>
-      )}
+      ) : null}
     </nav>
   );
 }

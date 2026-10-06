@@ -1,14 +1,17 @@
-"use client";
-
-import { useActionState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { resetPassword, type ActionState } from "@/lib/actions/auth";
-import { SubmitButton } from "@/components/SubmitButton";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 
-const initial: ActionState = {};
+export const metadata: Metadata = { title: "Configuración" };
 
-export default function SettingsPage() {
-  const [state, action] = useActionState(resetPassword, initial);
+export default async function SettingsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login"); // defensa en profundidad
 
   return (
     <main className="relative w-full flex-1 px-5 pb-16 pt-28 sm:px-10 lg:px-24">
@@ -27,69 +30,17 @@ export default function SettingsPage() {
           </div>
           <Link
             href="/dashboard"
-            className="text-sm text-white/60 hover:text-white transition"
+            className="text-sm text-white/60 hover:text-white"
           >
             ← Volver al dashboard
           </Link>
         </header>
 
-        <section className="py-10">
-          <h2 className="text-sm uppercase tracking-[0.25em] text-white/60 mb-6">
+        <section className="max-w-sm py-10">
+          <h2 className="mb-6 text-sm uppercase tracking-[0.25em] text-white/60">
             Cambiar contraseña
           </h2>
-
-          <form action={action} className="space-y-4" noValidate>
-            <div>
-              <label className="mb-2 block text-sm text-white/70">
-                Nueva contraseña
-              </label>
-              <input
-                type="password"
-                name="password"
-                required
-                minLength={6}
-                autoComplete="new-password"
-                className="w-full rounded border border-white/20 bg-black/50 p-3 text-white placeholder-gray-400 backdrop-blur-md focus:border-blue-500 focus:outline-none transition"
-              />
-              {state.fieldErrors?.password && (
-                <p className="mt-1 text-sm text-red-400">
-                  {state.fieldErrors.password[0]}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm text-white/70">
-                Confirmar contraseña
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                required
-                minLength={6}
-                autoComplete="new-password"
-                className="w-full rounded border border-white/20 bg-black/50 p-3 text-white placeholder-gray-400 backdrop-blur-md focus:border-blue-500 focus:outline-none transition"
-              />
-              {state.fieldErrors?.confirmPassword && (
-                <p className="mt-1 text-sm text-red-400">
-                  {state.fieldErrors.confirmPassword[0]}
-                </p>
-              )}
-            </div>
-
-            {state.error && (
-              <p role="alert" className="text-sm text-red-400">
-                {state.error}
-              </p>
-            )}
-            {state.success && (
-              <p role="status" className="text-sm text-green-400">
-                ✅ {state.success}
-              </p>
-            )}
-
-            <SubmitButton>Actualizar contraseña</SubmitButton>
-          </form>
+          <ChangePasswordForm />
         </section>
       </div>
     </main>
